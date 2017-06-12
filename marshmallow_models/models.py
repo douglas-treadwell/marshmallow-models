@@ -62,6 +62,8 @@ class Model(with_metaclass(ModelMeta, object)):
         if strict_constructor:
             constructor_schema.validate(self.__dict__)
 
+        self._schema = self._schema_class(strict=self._is_strict)
+
     @property
     def _is_strict(self):
         try:
@@ -69,12 +71,11 @@ class Model(with_metaclass(ModelMeta, object)):
         except AttributeError:
             return self._default_schema_config['strict']
 
-    @property
-    def _instance_schema(self):
-        if not hasattr(self, '_schema'):
-            self._schema = self._schema_class(strict=self._is_strict)
-
-        return self._schema
-
     def validate(self):
-        return self._instance_schema.validate(self.__dict__)
+        return self._schema.validate(self.__dict__)
+
+    def dump(self):
+        return self._schema.dump(self.__dict__)
+
+    def dumps(self):
+        return self._schema.dumps(self.__dict__)

@@ -59,6 +59,39 @@ class TestModel(TestCase):
 
         person.validate()
 
+    def test_dump(self):
+        person = PersonModel(dict(name='Tester', age=100))
+
+        data, errors = person.dump()
+        self.assertEqual(data, {
+            'name': 'Tester',
+            'age': 100
+        })
+
+        self.assertEqual(len(errors), 0)
+
+        person = PersonModel(dict(name='Tester'))
+
+        data, errors = person.dump()
+
+        self.assertEqual(data, {
+            'name': 'Tester'
+        })
+
+        self.assertEqual(len(errors), 0)
+
+    def test_dumps(self):
+        import json
+
+        person = PersonModel(dict(name='Tester', age=100))
+
+        data_string, errors = person.dumps()
+
+        self.assertEqual(json.loads(data_string), {
+            'name': 'Tester',
+            'age': 100
+        })
+
     def test_invalid_constructor_argument(self):
         with self.assertRaises(ValueError):
             PersonModel([])
