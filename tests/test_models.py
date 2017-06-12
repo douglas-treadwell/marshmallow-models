@@ -119,3 +119,40 @@ class TestModel(TestCase):
         self.assertIsNotNone(errors['name'])
         with self.assertRaises(KeyError):
             errors['age']
+
+    def test_strict_constructor(self):
+        class PersonWithStrictConstructorModel(Model):
+            class Meta:
+                strict_constructor = True
+
+            name = String(required=True)
+            age = Integer(required=True)
+
+        with self.assertRaises(ValidationError):
+            person = PersonWithStrictConstructorModel()
+
+    def test_defaults(self):
+        class PersonWithDefaults(Model):
+            name = String(default='Anonymous')
+            age = Integer(default=0)
+
+        person = PersonWithDefaults()
+
+        self.assertEqual(person.name, 'Anonymous')
+        self.assertEqual(person.age, 0)
+
+        class PersonWithDefaults(Model):
+            class Meta:
+                strict_constructor = True
+
+            name = String(required=True, default='Anonymous')
+            age = Integer(required=True, default=0)
+
+        # check that strict constructor doesn't fail
+        person = PersonWithDefaults()
+
+        # check that validation doesn't fail
+        person.validate()
+
+        self.assertEqual(person.name, 'Anonymous')
+        self.assertEqual(person.age, 0)
