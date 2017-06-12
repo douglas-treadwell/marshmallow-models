@@ -35,5 +35,12 @@ class Model(with_metaclass(ModelMeta, object)):
 
         self.__dict__ = _raw_data or kwargs
 
+    @property
+    def _instance_schema(self):
+        if not hasattr(self, '_schema'):
+            self._schema = self._schema_class(strict=True)
+
+        return self._schema
+
     def validate(self):
-        return self._schema_class(strict=True).validate(self.__dict__)
+        return self._instance_schema.validate(self.__dict__)
