@@ -86,3 +86,36 @@ class TestModel(TestCase):
 
         with self.assertRaises(ValidationError):  # missing name and age fields
             person.validate()
+
+    def test_schema_options(self):
+        with self.assertRaises(ValidationError):
+            person = PersonModel()
+            person.validate()
+
+        class PersonWithMetaModel(Model):
+            class Meta:
+                strict = False
+
+            name = String(required=True)
+            age = Integer(required=True)
+
+        person = PersonWithMetaModel(age=100)
+        errors = person.validate()
+
+        self.assertIsNotNone(errors['name'])
+        with self.assertRaises(KeyError):
+            errors['age']
+
+        class PersonWithOptionsModel(Model):
+            class Options:
+                strict = False
+
+            name = String(required=True)
+            age = Integer(required=True)
+
+        person = PersonWithOptionsModel(age=100)
+        errors = person.validate()
+
+        self.assertIsNotNone(errors['name'])
+        with self.assertRaises(KeyError):
+            errors['age']
