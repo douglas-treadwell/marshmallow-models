@@ -39,7 +39,7 @@ def read(filename):
 
 
 setup(
-    name='marshmallow_models',
+    name='marshmallow-models',
     version=__version__,
     description=('Object models with validation and serialization '
                  'using Marshmallow fields and validators.'),

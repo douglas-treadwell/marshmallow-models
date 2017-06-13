@@ -2,6 +2,17 @@ Marshmallow Models
 ==================
 
 
+Installation
+------------
+
+```
+pip install marshmallow-models
+```
+
+
+Overview
+--------
+
 Inspired by [Schematics](https://github.com/schematics/schematics).
 
 Whereas Marshmallow is an excellent serialization/deserialization
