@@ -139,20 +139,6 @@ class TestModel(TestCase):
         with self.assertRaises(KeyError):
             errors['age']
 
-        class PersonWithOptionsModel(Model):
-            class Options:
-                strict = False
-
-            name = String(required=True)
-            age = Integer(required=True)
-
-        person = PersonWithOptionsModel(age=100)
-        errors = person.validate()
-
-        self.assertIsNotNone(errors['name'])
-        with self.assertRaises(KeyError):
-            errors['age']
-
     def test_strict_constructor(self):
         class PersonWithStrictConstructorModel(Model):
             class Meta:

@@ -14,9 +14,6 @@ def is_schema_attribute(attr_name, attr):
 
 class ModelMeta(type):
     def __new__(mcs, name, bases, attrs):
-        if 'Options' in attrs:  # support Options alias for Meta
-            attrs['Meta'] = attrs['Options']
-
         model_attrs = {attr_name: attr
                        for attr_name, attr in attrs.items()
                        if is_model_attribute(attr_name, attr)}

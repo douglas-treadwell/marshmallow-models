@@ -60,6 +60,4 @@ person.dump().data  # {'name': 'Tester', 'age': 100}
 Configuration
 -------------
 
-Marshmallow Models support the "class Meta" configuration method,
-and also support defining the "class Meta" using the alias
-"class Options".
+Marshmallow Models support the "class Meta" configuration method.
