@@ -1,4 +1,6 @@
-venv/
+venv*/
 .idea/
 *.pyc
-
+*.egg-info/
+.tox/
+.python-version
