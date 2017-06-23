@@ -62,14 +62,18 @@ class TestModel(TestCase):
         self.assertEqual(person.x, 735734)
         self.assertEqual(person.y, '100')
 
-    def test_getting_deleted_defaults(self):
+    def test_getting_defaults_after_deletion(self):
         class PersonModelWithDefaults(Model):
-            name = String(default='default_name')
-            age = Integer(default=2017)
+            name = String(default='default_name', missing='missing_name')
+            age = Integer(default=2017, missing=7102)
 
         person = PersonModelWithDefaults()
 
-        # delete attributes because the constructor also inserts the defaults
+        self.assertEqual(person.name, 'missing_name')
+        self.assertEqual(person.age, 7102)
+
+        # delete the attributes with missing= that the constructor inserted
+
         del person.name
         del person.age
 
@@ -171,6 +175,19 @@ class TestModel(TestCase):
         with self.assertRaises(KeyError):
             errors['age']
 
+    def test_non_strict_constructor(self):
+        class PersonWithStrictConstructorModel(Model):
+            class Meta:
+                strict_constructor = False
+
+            name = String(required=True)
+            age = Integer(required=True)
+
+        person = PersonWithStrictConstructorModel()
+
+        # constructor correctly didn't raise an exception
+        self.assertIsNotNone(person)
+
     def test_strict_constructor(self):
         class PersonWithStrictConstructorModel(Model):
             class Meta:
@@ -189,6 +206,9 @@ class TestModel(TestCase):
 
         person = PersonWithDefaults()
 
+        self.assertNotIn('name', person.__dict__)
+        self.assertNotIn('age', person.__dict__)
+
         self.assertEqual(person.name, 'Anonymous')
         self.assertEqual(person.age, 0)
 
@@ -199,8 +219,35 @@ class TestModel(TestCase):
             name = String(required=True, default='Anonymous')
             age = Integer(required=True, default=0)
 
+        # check that strict constructor fails
+        with self.assertRaises(ValidationError):
+            person = PersonWithDefaults()
+
+        # check that validation doesn't fail
+        person.validate()
+
+        self.assertEqual(person.name, 'Anonymous')
+        self.assertEqual(person.age, 0)
+
+    def test_missing(self):
+        class PersonWithMissing(Model):
+            name = String(missing='Anonymous')
+            age = Integer(missing=0)
+
+        person = PersonWithMissing()
+
+        self.assertEqual(person.name, 'Anonymous')
+        self.assertEqual(person.age, 0)
+
+        class PersonWithMissing(Model):
+            class Meta:
+                strict_constructor = True
+
+            name = String(required=True, missing='Anonymous')
+            age = Integer(required=True, missing=0)
+
         # check that strict constructor doesn't fail
-        person = PersonWithDefaults()
+        person = PersonWithMissing()
 
         # check that validation doesn't fail
         person.validate()

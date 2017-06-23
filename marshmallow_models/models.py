@@ -56,10 +56,7 @@ class Model(with_metaclass(ModelMeta, object)):
 
         input_ = _raw_data or kwargs
 
-        self.__dict__ = constructor_schema.dump(input_).data
-
-        if strict_constructor:
-            constructor_schema.validate(self.__dict__)
+        self.__dict__ = constructor_schema.load(input_).data
 
         self._schema = self._schema_class(strict=self._is_strict)
 
