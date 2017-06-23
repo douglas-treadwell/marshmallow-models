@@ -43,6 +43,8 @@ class Model(with_metaclass(ModelMeta, object)):
         pass
 
     def __init__(self, _raw_data=None, **kwargs):
+        super(Model, self).__init__()
+
         if not isinstance(_raw_data, (dict, type(None))):
             raise ValueError('%s constructor accepts dictionary or kwargs.')
 
@@ -60,6 +62,36 @@ class Model(with_metaclass(ModelMeta, object)):
             constructor_schema.validate(self.__dict__)
 
         self._schema = self._schema_class(strict=self._is_strict)
+
+    def __setattr__(self, key, value):
+        if not hasattr(self, '_schema'):
+            return super(Model, self).__setattr__(key, value)
+
+        attr = self._schema.declared_fields.get(key, None)
+
+        if isinstance(attr, FieldABC):
+            # create a temporary structure to serialize the value from
+            serialized_value = attr.serialize('temp', {'temp': value})
+            return super(Model, self).__setattr__(key, serialized_value)
+        else:
+            return super(Model, self).__setattr__(key, value)
+
+    def __getattribute__(self, key):
+        try:
+            return super(Model, self).__getattribute__(key)
+        except AttributeError as outer_error:
+            try:
+                _schema = super(Model, self).__getattribute__('_schema')
+            except AttributeError:
+                raise outer_error
+
+            attr = _schema.declared_fields.get(key, None)
+
+            if isinstance(attr, FieldABC):
+                setattr(self, key, attr.serialize('temp', {}))
+                return super(Model, self).__getattribute__(key)
+            else:
+                raise outer_error
 
     @property
     def _is_strict(self):

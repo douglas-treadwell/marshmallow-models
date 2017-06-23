@@ -44,6 +44,38 @@ class TestModel(TestCase):
         self.assertEqual(person.name, 'Tester')
         self.assertEqual(person.age, 100)
 
+    def test_getting_converted_fields(self):
+        person = PersonModel()
+
+        person.name = 735734
+        person.age = '100'
+
+        self.assertEqual(person.name, '735734')
+        self.assertEqual(person.age, 100)
+
+    def test_get_and_set_non_fields(self):
+        person = PersonModel()
+
+        person.x = 735734
+        person.y = '100'
+
+        self.assertEqual(person.x, 735734)
+        self.assertEqual(person.y, '100')
+
+    def test_getting_deleted_defaults(self):
+        class PersonModelWithDefaults(Model):
+            name = String(default='default_name')
+            age = Integer(default=2017)
+
+        person = PersonModelWithDefaults()
+
+        # delete attributes because the constructor also inserts the defaults
+        del person.name
+        del person.age
+
+        self.assertEqual(person.name, 'default_name')
+        self.assertEqual(person.age, 2017)
+
     def test_validation(self):
         person = PersonModel(dict(name='Tester', age={}))
 
