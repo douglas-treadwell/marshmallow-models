@@ -1,6 +1,6 @@
 from unittest import TestCase
 from marshmallow import Schema
-from marshmallow_models import Model
+from marshmallow_models import Model, NestedModel
 from marshmallow.fields import String, Integer
 from marshmallow.exceptions import ValidationError
 
@@ -254,3 +254,71 @@ class TestModel(TestCase):
 
         self.assertEqual(person.name, 'Anonymous')
         self.assertEqual(person.age, 0)
+
+    def test_constructor_nested_models(self):
+        class ParentModel(PersonModel):
+            child = NestedModel(PersonModel)
+
+        parent1 = ParentModel(name='Tester', age=40, child=dict(name='Child1', age=10))
+        parent2 = ParentModel(name='Tester', age=40, child=dict(name='Child2', age=10))
+
+        self.assertEqual(parent1.child.name, 'Child1')
+        self.assertEqual(parent2.child.name, 'Child2')
+
+        parent1.child.validate()
+        parent1.validate()
+
+    def test_set_nested_model_attributes(self):
+        class ParentModel(PersonModel):
+            child = NestedModel(PersonModel)
+
+        parent = ParentModel(name='Tester', age=40, child=dict(name='Child', age=10))
+
+        self.assertEqual(parent.child.name, 'Child')
+
+        parent.child.name = 'Kid'
+
+        self.assertEqual(parent.child.name, 'Kid')
+
+        self.assertEqual(parent.dump().data['child']['name'], 'Kid')
+
+        parent.child.validate()
+        parent.validate()
+
+    def test_assign_nested_model(self):
+        class ParentModel(PersonModel):
+            child = NestedModel(PersonModel)
+
+        parent = ParentModel(name='Tester', age=40, child=dict(name='Child', age=10))
+
+        child = PersonModel(name='Kiddo', age=11)
+
+        parent.child = child
+
+        self.assertEqual(parent.dump().data['child']['name'], 'Kiddo')
+
+        parent.child.validate()
+        parent.validate()
+
+    def test_delete_nested_model_attributes(self):
+        class ParentModel(PersonModel):
+            child = NestedModel(PersonModel)
+
+        parent = ParentModel(name='Tester', age=40, child=dict(name='Child', age=10))
+
+        del parent.child.name
+
+        with self.assertRaises(AttributeError):
+            parent.child.name = parent.child.name  # rhs raises exception
+
+        with self.assertRaises(ValidationError):
+            parent.child.validate()
+
+        with self.assertRaises(ValidationError):
+            parent.validate()
+
+        parent.child.name = 'Kid'
+
+        self.assertEqual(parent.child.name, 'Kid')
+        parent.child.validate()
+        parent.validate()
