@@ -8,6 +8,9 @@ from compat import with_metaclass
 
 
 def is_model_attribute(attr_name, attr):
+    """
+    Methods and non-Field attributes belong to the model, not the Schema.
+    """
     return not isinstance(attr, FieldABC)
 
 
