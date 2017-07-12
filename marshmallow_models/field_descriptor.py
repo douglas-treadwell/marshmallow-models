@@ -1,4 +1,3 @@
-from marshmallow.fields import Nested
 from marshmallow import missing
 
 
@@ -50,12 +49,9 @@ class FieldDescriptor(object):
 
         schema_field = self._get_instance_field(model_instance)
 
-        if not isinstance(schema_field, Nested):
-            # create a temporary structure to serialize the value from
-            serialized_value = schema_field.serialize('temp', {'temp': value})
-            self._set_instance_value(model_instance, serialized_value)
-        else:
-            self._set_instance_value(model_instance, value)
+        # create a temporary structure to serialize the value from
+        serialized_value = schema_field.serialize('temp', {'temp': value})
+        self._set_instance_value(model_instance, serialized_value)
 
     def __delete__(self, model_instance):
         del model_instance._data[self.field_name]
