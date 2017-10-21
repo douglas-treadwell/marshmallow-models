@@ -4,7 +4,7 @@ from copy import deepcopy
 from marshmallow import missing
 from marshmallow.schema import Schema, SchemaMeta
 from marshmallow.fields import FieldABC, Nested
-from compat import with_metaclass
+from .compat import with_metaclass
 
 
 def is_model_attribute(attr_name, attr):
