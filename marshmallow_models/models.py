@@ -159,6 +159,9 @@ class Model(with_metaclass(ModelMeta, ModelABC)):
     def dumps(self):
         return self._schema.dumps(self.__dict__)
 
+    def __eq__(self, other):
+        return hasattr(other, 'dump') and self.dump() == other.dump()
+
 
 # noinspection PyPep8Naming
 def NestedModel(model):
