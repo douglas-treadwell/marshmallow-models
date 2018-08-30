@@ -4,7 +4,7 @@ from copy import deepcopy
 from marshmallow import missing
 from marshmallow.schema import Schema, SchemaMeta
 from marshmallow.fields import FieldABC, Nested
-from compat import with_metaclass
+from .compat import with_metaclass
 
 
 def is_model_attribute(attr_name, attr):
@@ -158,6 +158,9 @@ class Model(with_metaclass(ModelMeta, ModelABC)):
 
     def dumps(self):
         return self._schema.dumps(self.__dict__)
+
+    def __eq__(self, other):
+        return hasattr(other, 'dump') and self.dump() == other.dump()
 
 
 # noinspection PyPep8Naming
