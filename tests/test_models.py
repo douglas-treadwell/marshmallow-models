@@ -142,6 +142,7 @@ class TestModel(TestCase):
 
         self.assertIsNotNone(ParentSchema._declared_fields['name'])
         self.assertIsNotNone(person._schema_class._declared_fields['name'])
+        self.assertIsNotNone(person._schema._declared_fields['name'])
 
         self.assertEqual(person.name, 'Tester')
         self.assertEqual(person.age, 100)
