@@ -322,3 +322,32 @@ class TestModel(TestCase):
         self.assertEqual(parent.child.name, 'Kid')
         parent.child.validate()
         parent.validate()
+
+    def test_eq_models(self):
+        x = PersonModel(name='X', age=42)
+        y = PersonModel(name='X', age=42)
+        self.assertEqual(x, y)
+
+    def test_eq_different_models(self):
+        x = PersonModel(name='X', age=42)
+        y = PersonModel(name='X', age=43)
+        self.assertNotEqual(x, y)
+
+    def test_eq_different_class_models(self):
+        class OtherPersonModel(Model):
+            name = String(required=True)
+            age = Integer(required=True)
+
+        x = PersonModel(name='X', age=42)
+        y = OtherPersonModel(name='X', age=42)
+        self.assertEqual(x, y)
+
+    def test_eq_with_not_model(self):
+        class NotPersonModel(object):
+            def __init__(self, name, age):
+                self.name = name
+                self.age = age
+
+        x = PersonModel(name='X', age=42)
+        y = NotPersonModel(name='X', age=42)
+        self.assertNotEqual(x, y)
